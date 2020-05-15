@@ -101,5 +101,5 @@ git clone https://github.com/brentley/ecsdemo-crystal.git
 cd $this
 
 
-echo "Configure Cloud 9 - AWS Settings - then run part2.sh"
+echo "Configure Cloud 9 & AWS Settings - then run part2.sh"
 
