@@ -66,6 +66,30 @@ git clone https://github.com/brentley/ecsdemo-frontend.git
 git clone https://github.com/brentley/ecsdemo-nodejs.git
 git clone https://github.com/brentley/ecsdemo-crystal.git
 
+echo "kubectx"
+sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+
+echo "install go"
+wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin
+echo "export PATH=$PATH:/usr/local/go/bin" | tee -a ~/.bash_profile
+
+echo "install krew"
+set -x; cd "$(mktemp -d)" &&
+curl -fsSLO "https://storage.googleapis.com/krew/v0.2.1/krew.{tar.gz,yaml}" &&
+tar zxvf krew.tar.gz &&
+./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" install \
+    --manifest=krew.yaml --archive=krew.tar.gz
+
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+echo "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH" | tee -a ~/.bash_profile
+
+kubectl krew install access_matrix
+kubectl krew install rbac-lookup
+go get -v github.com/aquasecurity/kubectl-who-can
 
 
 eksctl version
