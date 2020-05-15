@@ -1,16 +1,14 @@
-echo "IAM role eksworkshop-admin"
-aws iam list-instance-profiles-for-role --role-name eksworkshop-admin
-aws iam remove-role-from-instance-profile --role-name eksworkshop-admin --instance-profile-name eksworkshop-admin
-aws iam delete-role --role-name eksworkshop-admin
-aws iam create-role --role-name eksworkshop-admin --assume-role-policy-document file://role-trust-policy.json
-aws iam attach-role-policy --role-name eksworkshop-admin --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
-aws iam create-instance-profile --instance-profile-name eksworkshop-admin
-aws iam add-role-to-instance-profile --instance-profile-name eksworkshop-admin --role-name eksworkshop-admin
+"Check my profile"
 instid=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id`
-aws ec2 associate-iam-instance-profile --iam-instance-profile eksworkshop-admin --instance-id $instid
-
-
-
+echo $instid
+ip=`aws ec2 describe-iam-instance-profile-associations --filters "Name=instance-id,Values=$instid" | jq .IamInstanceProfileAssociations[0].IamInstanceProfile.Arn | cut -f2 -d'/' | tr -d '"'`
+echo $ip
+if [ "$ip" != "eksworkshop-admin" ] ; then
+echo "Could not find Instance profile eksworkshop-admin exiting"
+exit
+else
+echo "OK Found Instance profile eksworkshop-admin"
+fi
 
 rm -vf ${HOME}/.aws/credentials
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
@@ -20,5 +18,5 @@ echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bash_profile
 echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bash_profile
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
-aws sts get-caller-identity --query Arn | grep eksworkshop-admin -q && echo "IAM role valid" || echo "IAM role NOT valid"
+aws sts get-caller-identity --query Arn | grep eksworkshop-admin -q && echo "IAM role valid - eksworkshop-admin" || echo "IAM role NOT valid"
 aws sts get-caller-identity
