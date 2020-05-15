@@ -1,0 +1,87 @@
+cd
+echo "kubectl"
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+echo "update aws cli"
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+rm -f awscliv2.zip
+rm -rf aws
+#sudo pip install --upgrade awscli && hash -r
+
+echo "other tools"
+sudo yum -y install jq gettext bash-completion wget
+echo "verify"
+for command in kubectl jq envsubst aws wget
+  do
+    which $command &>/dev/null && echo "$command in path" || echo "$command NOT FOUND"
+  done
+
+echo "Terraform"
+wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
+unzip terraform_0.12.24_linux_amd64.zip
+sudo mv terraform /usr/local/bin/
+rm -f terraform_0.12.24_linux_amd64.zip
+
+
+echo "Enable kubectl bash_completion"
+kubectl completion bash >>  ~/.bash_completion
+. /etc/profile.d/bash_completion.sh
+. ~/.bash_completion
+
+echo "ssh key"
+mkdir ~/.ssh
+ssh-keygen -b 2048 -t rsa -f ~/.ssh -q -N ""
+chmod 600 ~/.ssh/id*
+aws ec2 import-key-pair --key-name "eksworkshop" --public-key-material file://~/.ssh/id_rsa.pub
+echo "KMS key"
+aws kms create-alias --alias-name alias/eksworkshop --target-key-id $(aws kms create-key --query KeyMetadata.Arn --output text)
+export MASTER_ARN=$(aws kms describe-key --key-id alias/eksworkshop --query KeyMetadata.Arn --output text)
+echo "export MASTER_ARN=${MASTER_ARN}" | tee -a ~/.bash_profile
+
+echo "install eksctl"
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv -v /tmp/eksctl /usr/local/bin
+echo "eksctl completion"
+eksctl completion bash >> ~/.bash_completion
+. /etc/profile.d/bash_completion.sh
+. ~/.bash_completion
+echo "helm"
+wget https://get.helm.sh/helm-v3.2.1-linux-amd64.tar.gz
+tar -zxvf helm-v3.2.1-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin/helm
+rm -f helm-v3.2.1-linux-amd64.tar.gz linux-amd64
+
+
+
+
+
+
+echo "sample apps"
+cd ~/environment
+git clone https://github.com/brentley/ecsdemo-frontend.git
+git clone https://github.com/brentley/ecsdemo-nodejs.git
+git clone https://github.com/brentley/ecsdemo-crystal.git
+
+
+
+eksctl version
+kubectl version --client
+helm version
+
+echo "IAM role eksworkshop-admin"
+# aws iam list-instance-profiles-for-role --role-name eksworkshop-admin
+# aws iam remove-role-from-instance-profile --role-name eksworkshop-admin --instance-profile-name eksworkshop-admin
+# aws iam delete-role --role-name eksworkshop-admin
+aws iam create-role --role-name eksworkshop-admin --assume-role-policy-document file://role-trust-policy.json
+aws iam attach-role-policy --role-name eksworkshop-admin --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+aws iam create-instance-profile --instance-profile-name eksworkshop-admin
+aws iam add-role-to-instance-profile --instance-profile-name eksworkshop-admin --role-name eksworkshop-admin
+instid=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id`
+aws ec2 associate-iam-instance-profile --iam-instance-profile eksworkshop-admin --instance-id $instid
+echo "Configure Cloud 9 - AWS Settings - then run part2.sh"
+
+
