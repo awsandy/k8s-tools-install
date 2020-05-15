@@ -62,7 +62,7 @@ wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 echo "export PATH=$PATH:/usr/local/go/bin" | tee -a ~/.bash_profile
-
+rm -f go1.12.5.linux-amd64.tar.gz
 
 echo "verify"
 for command in kubectl jq envsubst aws wget terraform eksctl go helm kubectx
@@ -71,19 +71,19 @@ for command in kubectl jq envsubst aws wget terraform eksctl go helm kubectx
   done
 
 
-#echo "install krew"
-#set -x; cd "$(mktemp -d)" &&
-#curl -fsSLO "https://storage.googleapis.com/krew/v0.2.1/krew.{tar.gz,yaml}" &&
-#tar zxvf krew.tar.gz &&
-#./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" install \
-#    --manifest=krew.yaml --archive=krew.tar.gz
+echo "install krew"
 
-#export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-#echo "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH" | tee -a ~/.bash_profile
+curl -fsSLO "https://storage.googleapis.com/krew/v0.2.1/krew.{tar.gz,yaml}"
+tar zxvf krew.tar.gz 
+./krew-linux_amd64 install --manifest=krew.yaml --archive=krew.tar.gz
 
-#kubectl krew install access_matrix
-#kubectl krew install rbac-lookup
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+echo "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH" | tee -a ~/.bash_profile
+
+kubectl krew install access-matrix
+kubectl krew install rbac-lookup
 go get -v github.com/aquasecurity/kubectl-who-can
+
 
 aws --version
 eksctl version
