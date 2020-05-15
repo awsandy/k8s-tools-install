@@ -83,8 +83,9 @@ rm -f krew*
 rm -f linux-amd64
 kubectl krew install access-matrix
 kubectl krew install rbac-lookup
-go get -v github.com/aquasecurity/kubectl-who-can
 
+go get -v github.com/aquasecurity/kubectl-who-can
+kubectl krew install who-can
 
 aws --version
 eksctl version

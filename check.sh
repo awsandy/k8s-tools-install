@@ -1,6 +1,6 @@
-echo "Check my profile"
+"echo "Check my profile"
 instid=`curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id`
-echo $instid
+echo $instid"
 ip=`aws ec2 describe-iam-instance-profile-associations --filters "Name=instance-id,Values=$instid" | jq .IamInstanceProfileAssociations[0].IamInstanceProfile.Arn | cut -f2 -d'/' | tr -d '"'`
 echo $ip
 if [ "$ip" != "eksworkshop-admin" ] ; then
