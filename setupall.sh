@@ -1,4 +1,3 @@
-cd
 echo "kubectl"
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 chmod +x ./kubectl
@@ -6,7 +5,7 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 
 echo "update aws cli"
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
+unzip -q awscliv2.zip
 sudo ./aws/install
 rm -f awscliv2.zip
 rm -rf aws
@@ -14,15 +13,11 @@ rm -rf aws
 
 echo "other tools"
 sudo yum -y install jq gettext bash-completion wget
-echo "verify"
-for command in kubectl jq envsubst aws wget
-  do
-    which $command &>/dev/null && echo "$command in path" || echo "$command NOT FOUND"
-  done
+
 
 echo "Terraform"
 wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
-unzip terraform_0.12.24_linux_amd64.zip
+unzip -qq terraform_0.12.24_linux_amd64.zip
 sudo mv terraform /usr/local/bin/
 rm -f terraform_0.12.24_linux_amd64.zip
 
@@ -33,8 +28,8 @@ kubectl completion bash >>  ~/.bash_completion
 . ~/.bash_completion
 
 echo "ssh key"
-mkdir ~/.ssh
-ssh-keygen -b 2048 -t rsa -f ~/.ssh -q -N ""
+mkdir -p ~/.ssh
+ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 chmod 600 ~/.ssh/id*
 aws ec2 import-key-pair --key-name "eksworkshop" --public-key-material file://~/.ssh/id_rsa.pub
 echo "KMS key"
@@ -56,16 +51,6 @@ sudo mv linux-amd64/helm /usr/local/bin/helm
 rm -f helm-v3.2.1-linux-amd64.tar.gz linux-amd64
 
 
-
-
-
-
-echo "sample apps"
-cd ~/environment
-git clone https://github.com/brentley/ecsdemo-frontend.git
-git clone https://github.com/brentley/ecsdemo-nodejs.git
-git clone https://github.com/brentley/ecsdemo-crystal.git
-
 echo "kubectx"
 sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
@@ -77,21 +62,29 @@ sudo tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 echo "export PATH=$PATH:/usr/local/go/bin" | tee -a ~/.bash_profile
 
-echo "install krew"
-set -x; cd "$(mktemp -d)" &&
-curl -fsSLO "https://storage.googleapis.com/krew/v0.2.1/krew.{tar.gz,yaml}" &&
-tar zxvf krew.tar.gz &&
-./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" install \
-    --manifest=krew.yaml --archive=krew.tar.gz
 
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-echo "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH" | tee -a ~/.bash_profile
+echo "verify"
+for command in kubectl jq envsubst aws wget terraform eksctl go helm kubectx
+  do
+    which $command &>/dev/null && echo "$command in path" || echo "$command NOT FOUND"
+  done
 
-kubectl krew install access_matrix
-kubectl krew install rbac-lookup
+
+#echo "install krew"
+#set -x; cd "$(mktemp -d)" &&
+#curl -fsSLO "https://storage.googleapis.com/krew/v0.2.1/krew.{tar.gz,yaml}" &&
+#tar zxvf krew.tar.gz &&
+#./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" install \
+#    --manifest=krew.yaml --archive=krew.tar.gz
+
+#export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+#echo "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH" | tee -a ~/.bash_profile
+
+#kubectl krew install access_matrix
+#kubectl krew install rbac-lookup
 go get -v github.com/aquasecurity/kubectl-who-can
 
-
+aws --version
 eksctl version
 kubectl version --client
 helm version
@@ -106,6 +99,18 @@ aws iam create-instance-profile --instance-profile-name eksworkshop-admin
 aws iam add-role-to-instance-profile --instance-profile-name eksworkshop-admin --role-name eksworkshop-admin
 instid=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id`
 aws ec2 associate-iam-instance-profile --iam-instance-profile eksworkshop-admin --instance-id $instid
-echo "Configure Cloud 9 - AWS Settings - then run part2.sh"
 
+
+this=`pwd`
+echo "sample apps"
+cd ~/environment
+git clone https://github.com/brentley/ecsdemo-frontend.git
+git clone https://github.com/brentley/ecsdemo-nodejs.git
+git clone https://github.com/brentley/ecsdemo-crystal.git
+
+cd $this
+
+
+
+echo "Configure Cloud 9 - AWS Settings - then run part2.sh"
 
