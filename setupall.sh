@@ -79,7 +79,8 @@ tar zxvf krew.tar.gz
 
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 echo "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH" | tee -a ~/.bash_profile
-
+rm -f krew*
+rm -f linux-amd64
 kubectl krew install access-matrix
 kubectl krew install rbac-lookup
 go get -v github.com/aquasecurity/kubectl-who-can
