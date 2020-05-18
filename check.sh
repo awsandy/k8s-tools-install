@@ -10,3 +10,5 @@ else
 echo "OK Found Instance profile eksworkshop-admin"
 fi
 aws sts get-caller-identity --query Arn | grep eksworkshop-admin -q && echo "IAM role valid - eksworkshop-admin" || echo "IAM role NOT valid"
+kubectl get configmap -n kube-system aws-auth -o yaml > /tmp/aws-auth.yaml
+cat /tmp/aws-auth.yaml
