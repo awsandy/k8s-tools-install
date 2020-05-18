@@ -6,9 +6,9 @@ kind: ClusterConfig
 metadata:
   name: ateks1v
   region: eu-west-2 # London as no Fargate
-  version: 1.16
+  version: "1.16"
 
-availabilityZones: ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+#availabilityZones: ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
 managedNodeGroups:
   - name: ng-1
     instanceType: t3.small
