@@ -1,0 +1,68 @@
+# A simple example of ClusterConfig object:
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ateks1v
+  region: eu-west-2 # London as no Fargate
+  version: 1.16
+
+availabilityZones: ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+managedNodeGroups:
+  - name: ng-1
+    instanceType: t3.small
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 6
+    privateNetworking: true    
+    ssh:
+      allow: true # will use ~/.ssh/id_rsa.pub as the default ssh key
+    labels: { role: workers }
+    iam:
+      withAddonPolicies:
+        ebs: true
+        efs: true
+        albIngress: true
+        autoScaler: true
+        cloudWatch: true
+    #targetGroupARNs:
+    #  - arn:aws:elasticloadbalancing:eu-west-2:01234567890:targetgroup/target-group-1/abcdef0123456789
+    #volumeSize: 100
+    #volumeType: gp2
+    #volumeEncrypted: true
+    # another option  #volumeKmsKeyID: 36c0b54e-64ed-4f2d-a1c7-96558764311e # please see https://docs.aws.amazon.com/autoscaling/ec2/userguide/key-policy-requirements-EBS-encryption.html for service-linked role permissions
+
+
+cloudWatch:
+    clusterLogging:
+        # enable specific types of cluster control plane logs
+        enableTypes: ["all"]
+        # all supported types: "api", "audit", "authenticator", "controllerManager", "scheduler"
+        # supported special values: "*" and "all"
+
+vpc:
+  id: "vpc-08120ff2dce00dd4b"
+  cidr: "10.199.0.0/16"
+  subnets:
+    private:
+      eu-west-2b:
+          id: "subnet-0de23ca6df7329e3c"
+          cidr: "10.199.128.0/19"
+      eu-west-2a:
+          id: "subnet-0e34691decec40456"
+          cidr: "10.199.96.0/19"
+      eu-west-2c:
+          id: "subnet-0021e1f69d1bdc214"
+          cidr: "10.199.160.0/19"
+  
+  autoAllocateIPv6: false
+  # disable public access to endpoint and only allow private access
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
+  nat:
+    gateway: Single # other options: Disable, Single (default),HighlyAvailable
+
+
+    
