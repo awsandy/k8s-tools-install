@@ -12,7 +12,7 @@ rm -rf aws
 #sudo pip install --upgrade awscli && hash -r
 
 echo "other tools"
-sudo yum -y install jq gettext bash-completion wget
+sudo yum -y install jq gettext bash-completion wget nmap bind-utils
 
 
 echo "Terraform"
