@@ -16,10 +16,10 @@ sudo yum -y install jq gettext bash-completion wget nmap bind-utils
 
 
 echo "Terraform"
-wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
-unzip -qq terraform_0.12.24_linux_amd64.zip
+wget https://releases.hashicorp.com/terraform/0.12.26/terraform_0.12.26_linux_amd64.zip
+unzip -qq terraform_0.12.26_linux_amd64.zip
 sudo mv terraform /usr/local/bin/
-rm -f terraform_0.12.24_linux_amd64.zip
+rm -f terraform_0.12.26_linux_amd64.zip
 
 
 echo "Enable kubectl bash_completion"
@@ -89,10 +89,6 @@ kubectl krew install rbac-lookup
 go get -v github.com/aquasecurity/kubectl-who-can
 kubectl krew install who-can
 
-aws --version
-eksctl version
-kubectl version --client
-helm version
 
 this=`pwd`
 echo "sample apps"
@@ -100,6 +96,15 @@ cd ~/environment
 git clone https://github.com/brentley/ecsdemo-frontend.git
 git clone https://github.com/brentley/ecsdemo-nodejs.git
 git clone https://github.com/brentley/ecsdemo-crystal.git
+git clone https://github.com/awsandy/aws2tf.git
+git clone https://github.com/awsandy/weks1.git
+
+
+aws --version
+eksctl version
+kubectl version --client
+helm version
+
 
 cd $this
 
