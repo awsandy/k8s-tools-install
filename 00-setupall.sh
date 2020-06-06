@@ -49,7 +49,7 @@ echo "helm"
 wget https://get.helm.sh/helm-v3.2.1-linux-amd64.tar.gz
 tar -zxvf helm-v3.2.1-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm
-rm -f helm-v3.2.1-linux-amd64.tar.gz linux-amd64
+rm -rf helm-v3.2.1-linux-amd64.tar.gz linux-amd64
 echo "add a repo"
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 
@@ -82,7 +82,7 @@ tar zxvf krew.tar.gz
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 echo "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH" | tee -a ~/.bash_profile
 rm -f krew*
-rm -f linux-amd64
+rm -rf linux-amd64
 kubectl krew install access-matrix
 kubectl krew install rbac-lookup
 
