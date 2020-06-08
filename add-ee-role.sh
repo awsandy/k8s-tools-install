@@ -3,7 +3,7 @@ cat << EoF >> aws-auth.yaml
 data:
   mapUsers: |
     - userarn: arn:aws:iam::${ACCOUNT_ID}:assumed-role/TeamRole/MasterKey
-      username: rbac-user
+      username: ee-master-role
       groups:
         - system:masters
 EoF
